@@ -6,15 +6,19 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 	"unicode"
 )
 
-// StringArray type compatible with varchar[] in PostgreSQL
-// FIXME doesn't work for any string (for example, doesn't work with spaces)
+// StringArray is a slice of string values, compatible with PostgreSQL's varchar[].
 type StringArray []string
 
-// Value implements database/sql/driver Valuer interface
+func (a StringArray) Len() int           { return len(a) }
+func (a StringArray) Less(i, j int) bool { return a[i] < a[j] }
+func (a StringArray) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+// Value implements database/sql/driver Valuer interface.
 func (a StringArray) Value() (driver.Value, error) {
 	if a == nil {
 		return nil, nil
@@ -30,6 +34,7 @@ func (a StringArray) Value() (driver.Value, error) {
 	return []byte("{" + strings.Join(res, ",") + "}"), nil
 }
 
+// Scan implements database/sql Scanner interface.
 func (a *StringArray) Scan(value interface{}) error {
 	if value == nil {
 		*a = nil
@@ -112,6 +117,7 @@ func (a *StringArray) Scan(value interface{}) error {
 
 // check interfaces
 var (
-	_ driver.Valuer = StringArray{}
-	_ sql.Scanner   = &StringArray{}
+	_ sort.Interface = StringArray{}
+	_ driver.Valuer  = StringArray{}
+	_ sql.Scanner    = &StringArray{}
 )
