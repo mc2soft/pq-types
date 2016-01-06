@@ -1,0 +1,23 @@
+language: go
+
+sudo: required
+dist: trusty
+
+env:
+  - PGVERSION=9.1
+  - PGVERSION=9.2
+  - PGVERSION=9.3
+  - PGVERSION=9.4
+
+go:
+  - 1.5.2
+  - tip
+
+before_install:
+  - sudo /etc/init.d/postgresql stop
+  - sudo /etc/init.d/postgresql start $PGVERSION
+
+before_script:
+  - createdb pq_types
+
+script: go test -v -check.v
