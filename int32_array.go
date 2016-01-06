@@ -38,11 +38,11 @@ func (a *Int32Array) Scan(value interface{}) error {
 
 	v, ok := value.([]byte)
 	if !ok {
-		return fmt.Errorf("models: expected []byte, got %T (%q)", value, value)
+		return fmt.Errorf("Int32Array.Scan: expected []byte, got %T (%q)", value, value)
 	}
 
 	if len(v) < 2 || v[0] != '{' || v[len(v)-1] != '}' {
-		return fmt.Errorf("models: unexpected data %q", v)
+		return fmt.Errorf("Int32Array.Scan: unexpected data %q", v)
 	}
 
 	p := strings.Split(string(v[1:len(v)-1]), ",")
