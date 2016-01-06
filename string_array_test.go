@@ -17,7 +17,7 @@ func (s *TypesSuite) TestStringArray(c *C) {
 		{StringArray{}, []byte(`{}`)},
 
 		{StringArray{`1234567`}, []byte(`{1234567}`)},
-		{StringArray{`abc123 def456`, `абв789`}, []byte(`{"abc123 def456",абв789}`)},
+		{StringArray{`abc123, def456 xyz789`, `абв`, `世界,`}, []byte(`{"abc123, def456 xyz789",абв,"世界,"}`)},
 
 		{StringArray{"", "`", "``", "```", "````"}, []byte("{\"\",`,``,```,````}")},
 		{StringArray{``, `'`, `''`, `'''`, `''''`}, []byte(`{"",','',''',''''}`)},
