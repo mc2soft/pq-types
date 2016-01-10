@@ -22,7 +22,7 @@ func (s *TypesSuite) TestInt32Array(c *C) {
 		s.SetUpTest(c)
 
 		_, err := s.db.Exec("INSERT INTO pq_types (int32_array) VALUES($1)", d.a)
-		c.Check(err, IsNil)
+		c.Assert(err, IsNil)
 
 		b1 := []byte("42")
 		a1 := Int32Array{42}

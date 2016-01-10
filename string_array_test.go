@@ -32,7 +32,7 @@ func (s *TypesSuite) TestStringArray(c *C) {
 		s.SetUpTest(c)
 
 		_, err := s.db.Exec("INSERT INTO pq_types (stringarray) VALUES($1)", d.a)
-		c.Check(err, IsNil)
+		c.Assert(err, IsNil)
 
 		b1 := []byte("lalala")
 		a1 := StringArray{"lalala"}
