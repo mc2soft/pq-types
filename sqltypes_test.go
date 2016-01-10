@@ -84,7 +84,7 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 		_, err = s.db.Exec("SELECT AddGeometryColumn('pq_types','polygon','4326','POLYGON',2)")
 		c.Check(err, IsNil)
 	} else {
-		log.Print("PostGIS not available")
+		log.Printf("PostGIS not available: %s", err)
 		s.skipPostGIS = true
 	}
 }
