@@ -18,6 +18,7 @@ before_install:
   - sudo /etc/init.d/postgresql start $PGVERSION
 
 before_script:
+  - createdb -V
   - createdb pq_types
 
 script: go test -v -check.v

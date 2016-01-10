@@ -2,6 +2,7 @@ package pq_types
 
 import (
 	"database/sql"
+	"log"
 	"testing"
 
 	_ "github.com/lib/pq"
@@ -21,6 +22,12 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 	db, err := sql.Open("postgres", "dbname=pq_types sslmode=disable")
 	c.Assert(err, IsNil)
 	s.db = db
+
+	var version string
+	row := db.QueryRow("SELECT version()")
+	err = row.Scan(&version)
+	c.Assert(err, IsNil)
+	log.Print(version)
 
 	s.db.Exec("DROP TABLE IF EXISTS pq_types")
 	_, err = s.db.Exec(`CREATE TABLE pq_types(
