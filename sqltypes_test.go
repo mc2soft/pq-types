@@ -12,8 +12,8 @@ import (
 func Test(t *testing.T) { TestingT(t) }
 
 type TypesSuite struct {
-	db               *sql.DB
-	skipPostgisTests bool
+	db          *sql.DB
+	skipPostGIS bool
 }
 
 var _ = Suite(&TypesSuite{})
@@ -32,20 +32,16 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 	s.db.Exec("DROP TABLE IF EXISTS pq_types")
 	_, err = s.db.Exec(`CREATE TABLE pq_types(
 		stringarray varchar[],
-		int32_array int[]
+		int32_array int[],
+		jsontext_varchar varchar,
+		jsontext_json json,
+		jsontext_jsonb jsonb
 	)`)
-	// TODO
-	// jsontext_varchar varchar,
-	// jsontext_json json,
-	// jsontext_jsonb jsonb
 	c.Check(err, IsNil)
 
 	if _, err = s.db.Exec("SELECT PostGIS_full_version()"); err != nil {
-		s.skipPostgisTests = true
-		c.Log("It seems you have not installed Postgis, skipping Postgis tests..")
-	}
-
-	if !s.skipPostgisTests {
+		s.skipPostGIS = true
+	} else {
 		_, err = s.db.Exec("ALTER TABLE pq_types ADD COLUMN box box2d")
 		c.Check(err, IsNil)
 
