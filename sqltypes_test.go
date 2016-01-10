@@ -70,8 +70,11 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 	}
 
 	// check PostGIS
-	row = db.QueryRow("SELECT PostGIS_full_version()")
-	err = row.Scan(&version)
+	_, err = db.Exec("CREATE EXTENSION postgis")
+	if err == nil {
+		row = db.QueryRow("SELECT PostGIS_full_version()")
+		err = row.Scan(&version)
+	}
 	if err == nil {
 		log.Print(version)
 
