@@ -76,14 +76,12 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 	if err == nil {
 		log.Print(version)
 
-		_, err = s.db.Exec("ALTER TABLE pq_types ADD COLUMN box box2d")
-		c.Check(err, IsNil)
-
-		_, err = s.db.Exec("SELECT AddGeometryColumn('pq_types','point','4326','POINT',2)")
-		c.Check(err, IsNil)
-
-		_, err = s.db.Exec("SELECT AddGeometryColumn('pq_types','polygon','4326','POLYGON',2)")
-		c.Check(err, IsNil)
+		_, err = s.db.Exec(`ALTER TABLE pq_types
+			ADD COLUMN point geometry(POINT, 4326),
+			ADD COLUMN box box2d,
+			ADD COLUMN polygon geometry(POLYGON, 4326)
+		`)
+		c.Assert(err, IsNil)
 	} else {
 		log.Printf("PostGIS not available: %s", err)
 		s.skipPostGIS = true
