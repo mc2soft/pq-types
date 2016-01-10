@@ -10,12 +10,13 @@ import (
 	"strings"
 )
 
-// Point type compatible with PostGIS POINT type
+// Point is wrapper for PostGIS POINT type.
 type Point struct {
 	Lon, Lat float64
 }
 
-// Value implements database/sql/driver Valuer interface
+// Value implements database/sql/driver Valuer interface.
+// It returns point as WKT with SRID 4326 (WGS 84).
 func (p Point) Value() (driver.Value, error) {
 	return []byte(fmt.Sprintf("SRID=4326;POINT(%.7f %.7f)", p.Lon, p.Lat)), nil
 }
@@ -27,11 +28,14 @@ type ewkbPoint struct {
 	Point     Point
 }
 
-// Scan implements database/sql Scanner interface
+// Scan implements database/sql Scanner interface.
+// It expectes EWKB with SRID 4326 (WGS 84).
 func (p *Point) Scan(value interface{}) error {
 	if value == nil {
+		*p = Point{}
 		return nil
 	}
+
 	v, ok := value.([]byte)
 	if !ok {
 		return fmt.Errorf("pq_types: expected []byte, got %T (%v)", value, value)
@@ -67,16 +71,18 @@ type Box2D struct {
 	Min, Max Point
 }
 
-// Value implements database/sql/driver Valuer interface
+// Value implements database/sql/driver Valuer interface.
 func (b Box2D) Value() (driver.Value, error) {
 	return []byte(fmt.Sprintf("BOX(%.7f %.7f,%.7f %.7f)", b.Min.Lon, b.Min.Lat, b.Max.Lon, b.Max.Lat)), nil
 }
 
-// Scan implements database/sql Scanner interface
+// Scan implements database/sql Scanner interface.
 func (b *Box2D) Scan(value interface{}) error {
 	if value == nil {
+		*b = Box2D{}
 		return nil
 	}
+
 	v, ok := value.([]byte)
 	if !ok {
 		return fmt.Errorf("pq_types: expected []byte, got %T (%v)", value, value)
@@ -133,7 +139,7 @@ func (p *Polygon) Max() Point {
 	return p.Points[2]
 }
 
-// Value implements database/sql/driver Valuer interface
+// Value implements database/sql/driver Valuer interface.
 func (p Polygon) Value() (driver.Value, error) {
 	parts := make([]string, len(p.Points))
 	for i, pt := range p.Points {
@@ -150,11 +156,13 @@ type ewkbPolygon struct {
 	Count     uint32
 }
 
-// Scan implements database/sql Scanner interface
+// Scan implements database/sql Scanner interface.
 func (p *Polygon) Scan(value interface{}) error {
 	if value == nil {
+		*p = Polygon{}
 		return nil
 	}
+
 	v, ok := value.([]byte)
 	if !ok {
 		return fmt.Errorf("pq_types: expected []byte, got %T (%v)", value, value)
