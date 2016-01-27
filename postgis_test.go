@@ -5,7 +5,7 @@ import (
 )
 
 func (s *TypesSuite) TestPointScanValue(c *C) {
-	var a Point
+	var a PostGISPoint
 	b := []byte{
 		0x30, 0x31, 0x30, 0x31, 0x30, 0x30, 0x30, 0x30, 0x32, 0x30, 0x45, 0x36,
 		0x31, 0x30, 0x30, 0x30, 0x30, 0x30, 0x34, 0x34, 0x36, 0x45, 0x38, 0x36,
@@ -14,7 +14,7 @@ func (s *TypesSuite) TestPointScanValue(c *C) {
 		0x34, 0x30,
 	}
 	c.Check(a.Scan(b), IsNil)
-	c.Check(a, DeepEquals, Point{Lon: 37.6088900, Lat: 55.8219130})
+	c.Check(a, DeepEquals, PostGISPoint{Lon: 37.6088900, Lat: 55.8219130})
 	v, err := a.Value()
 	c.Check(err, IsNil)
 	c.Check(v, DeepEquals, []byte(`SRID=4326;POINT(37.6088900 55.8219130)`))
@@ -25,7 +25,7 @@ func (s *TypesSuite) TestPoint(c *C) {
 		c.Skip("PostGIS not available")
 	}
 
-	for _, p := range []Point{
+	for _, p := range []PostGISPoint{
 		{Lon: 37.6088900, Lat: 55.8219130},
 		{Lon: -37.6088900, Lat: -55.8219130},
 		{Lon: 0, Lat: 0},
@@ -36,7 +36,7 @@ func (s *TypesSuite) TestPoint(c *C) {
 		_, err := s.db.Exec("INSERT INTO pq_types (point) VALUES($1)", p)
 		c.Assert(err, IsNil)
 
-		p1 := Point{Lon: -1, Lat: -1}
+		p1 := PostGISPoint{Lon: -1, Lat: -1}
 		err = s.db.QueryRow("SELECT point FROM pq_types").Scan(&p1)
 		c.Check(err, IsNil)
 
@@ -51,7 +51,7 @@ func (s *TypesSuite) TestBox2DScanValue(c *C) {
 		0x32, 0x35, 0x2c, 0x30, 0x2e, 0x35, 0x20, 0x31, 0x29,
 	}
 	c.Check(a.Scan(b), IsNil)
-	c.Check(a, DeepEquals, Box2D{Min: Point{Lon: 0.125, Lat: 0.25}, Max: Point{Lon: 0.5, Lat: 1}})
+	c.Check(a, DeepEquals, Box2D{Min: PostGISPoint{Lon: 0.125, Lat: 0.25}, Max: PostGISPoint{Lon: 0.5, Lat: 1}})
 	v, err := a.Value()
 	c.Check(err, IsNil)
 	c.Check(v, DeepEquals, []byte(`BOX(0.1250000 0.2500000,0.5000000 1.0000000)`))
@@ -63,9 +63,9 @@ func (s *TypesSuite) TestBox2D(c *C) {
 	}
 
 	for _, b := range []Box2D{
-		{Min: Point{Lon: 0.125, Lat: 0.25}, Max: Point{Lon: 0.5, Lat: 1}},
-		{Min: Point{Lon: -0.125, Lat: -0.25}, Max: Point{Lon: 0.5, Lat: 1}},
-		{Min: Point{Lon: -0.55, Lat: -0.55}, Max: Point{Lon: 0.5, Lat: 1}},
+		{Min: PostGISPoint{Lon: 0.125, Lat: 0.25}, Max: PostGISPoint{Lon: 0.5, Lat: 1}},
+		{Min: PostGISPoint{Lon: -0.125, Lat: -0.25}, Max: PostGISPoint{Lon: 0.5, Lat: 1}},
+		{Min: PostGISPoint{Lon: -0.55, Lat: -0.55}, Max: PostGISPoint{Lon: 0.5, Lat: 1}},
 	} {
 		s.SetUpTest(c)
 
@@ -103,7 +103,7 @@ func (s *TypesSuite) TestPolygonScanValue(c *C) {
 	}
 	c.Check(a.Scan(b), IsNil)
 	c.Check(a, DeepEquals, Polygon{
-		Points: []Point{
+		Points: []PostGISPoint{
 			{Lon: 0.125, Lat: 0.25},
 			{Lon: 0.125, Lat: 1},
 			{Lon: 0.5, Lat: 1},
@@ -123,14 +123,14 @@ func (s *TypesSuite) TestPolygon(c *C) {
 
 	for _, p := range []Polygon{
 		{
-			Points: []Point{
+			Points: []PostGISPoint{
 				{Lon: 0.125, Lat: 0.25},
 				{Lon: 0.125, Lat: 1},
 				{Lon: 0.5, Lat: 1},
 				{Lon: 0.5, Lat: 0.25},
 				{Lon: 0.125, Lat: 0.25}}},
 		{
-			Points: []Point{
+			Points: []PostGISPoint{
 				{Lon: 0.0, Lat: 0.0},
 				{Lon: -50.555, Lat: -50.555},
 				{Lon: -50, Lat: 0},

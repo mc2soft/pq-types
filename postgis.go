@@ -10,14 +10,14 @@ import (
 	"strings"
 )
 
-// Point is wrapper for PostGIS POINT type.
-type Point struct {
+// PostGISPoint is wrapper for PostGIS POINT type.
+type PostGISPoint struct {
 	Lon, Lat float64
 }
 
 // Value implements database/sql/driver Valuer interface.
 // It returns point as WKT with SRID 4326 (WGS 84).
-func (p Point) Value() (driver.Value, error) {
+func (p PostGISPoint) Value() (driver.Value, error) {
 	return []byte(fmt.Sprintf("SRID=4326;POINT(%.7f %.7f)", p.Lon, p.Lat)), nil
 }
 
@@ -25,14 +25,14 @@ type ewkbPoint struct {
 	ByteOrder byte   // 1 (LittleEndian)
 	WkbType   uint32 // 0x20000001 (PointS)
 	SRID      uint32 // 4326
-	Point     Point
+	Point     PostGISPoint
 }
 
 // Scan implements database/sql Scanner interface.
 // It expectes EWKB with SRID 4326 (WGS 84).
-func (p *Point) Scan(value interface{}) error {
+func (p *PostGISPoint) Scan(value interface{}) error {
 	if value == nil {
-		*p = Point{}
+		*p = PostGISPoint{}
 		return nil
 	}
 
@@ -62,13 +62,13 @@ func (p *Point) Scan(value interface{}) error {
 
 // check interfaces
 var (
-	_ driver.Valuer = Point{}
-	_ sql.Scanner   = &Point{}
+	_ driver.Valuer = PostGISPoint{}
+	_ sql.Scanner   = &PostGISPoint{}
 )
 
 // Box2D type compatible with PostGIS Box2d type
 type Box2D struct {
-	Min, Max Point
+	Min, Max PostGISPoint
 }
 
 // Value implements database/sql/driver Valuer interface.
@@ -107,18 +107,18 @@ var (
 
 // Polygon type compatible with PostGIS POLYGON type
 type Polygon struct {
-	Points []Point
+	Points []PostGISPoint
 }
 
 // MakeEnvelope returns rectangular (min, max) polygon
-func MakeEnvelope(min, max Point) Polygon {
+func MakeEnvelope(min, max PostGISPoint) Polygon {
 	return Polygon{
-		Points: []Point{min, {Lon: min.Lon, Lat: max.Lat}, max, {Lon: max.Lon, Lat: min.Lat}, min},
+		Points: []PostGISPoint{min, {Lon: min.Lon, Lat: max.Lat}, max, {Lon: max.Lon, Lat: min.Lat}, min},
 	}
 }
 
 // Min returns min side of rectangular polygon
-func (p *Polygon) Min() Point {
+func (p *Polygon) Min() PostGISPoint {
 	if len(p.Points) != 5 || p.Points[0] != p.Points[4] ||
 		p.Points[0].Lon != p.Points[1].Lon || p.Points[0].Lat != p.Points[3].Lat ||
 		p.Points[1].Lat != p.Points[2].Lat || p.Points[2].Lon != p.Points[3].Lon {
@@ -129,7 +129,7 @@ func (p *Polygon) Min() Point {
 }
 
 // Max returns max side of rectangular polygon
-func (p *Polygon) Max() Point {
+func (p *Polygon) Max() PostGISPoint {
 	if len(p.Points) != 5 || p.Points[0] != p.Points[4] ||
 		p.Points[0].Lon != p.Points[1].Lon || p.Points[0].Lat != p.Points[3].Lat ||
 		p.Points[1].Lat != p.Points[2].Lat || p.Points[2].Lon != p.Points[3].Lon {
@@ -185,7 +185,7 @@ func (p *Polygon) Scan(value interface{}) error {
 	if ewkbP.ByteOrder != 1 || ewkbP.WkbType != 0x20000003 || ewkbP.SRID != 4326 || ewkbP.Rings != 1 {
 		return fmt.Errorf("pq_types: unexpected ewkb %#v", ewkbP)
 	}
-	p.Points = make([]Point, ewkbP.Count)
+	p.Points = make([]PostGISPoint, ewkbP.Count)
 
 	err = binary.Read(r, binary.LittleEndian, p.Points)
 	if err != nil {
