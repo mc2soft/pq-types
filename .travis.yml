@@ -10,7 +10,7 @@ env:
   - PGVERSION=9.4
 
 go:
-  - 1.5.2
+  - 1.5.3
   - tip
 
 before_install:
