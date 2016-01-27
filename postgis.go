@@ -72,11 +72,13 @@ type PostGISBox2D struct {
 }
 
 // Value implements database/sql/driver Valuer interface.
+// It returns box as WKT.
 func (b PostGISBox2D) Value() (driver.Value, error) {
 	return []byte(fmt.Sprintf("BOX(%.7f %.7f,%.7f %.7f)", b.Min.Lon, b.Min.Lat, b.Max.Lon, b.Max.Lat)), nil
 }
 
 // Scan implements database/sql Scanner interface.
+// It expectes WKT.
 func (b *PostGISBox2D) Scan(value interface{}) error {
 	if value == nil {
 		*b = PostGISBox2D{}
@@ -105,8 +107,7 @@ var (
 	_ sql.Scanner   = &PostGISBox2D{}
 )
 
-// Polygon type compatible with PostGIS POLYGON type
-// PostGISBox2D is wrapper for PostGIS Box2D type.
+// PostGISPolygon is wrapper for PostGIS Polygon type.
 type PostGISPolygon struct {
 	Points []PostGISPoint
 }
@@ -141,6 +142,7 @@ func (p *PostGISPolygon) Max() PostGISPoint {
 }
 
 // Value implements database/sql/driver Valuer interface.
+// It returns polygon as WKT with SRID 4326 (WGS 84).
 func (p PostGISPolygon) Value() (driver.Value, error) {
 	parts := make([]string, len(p.Points))
 	for i, pt := range p.Points {
@@ -158,6 +160,7 @@ type ewkbPolygon struct {
 }
 
 // Scan implements database/sql Scanner interface.
+// It expectes EWKB with SRID 4326 (WGS 84).
 func (p *PostGISPolygon) Scan(value interface{}) error {
 	if value == nil {
 		*p = PostGISPolygon{}
