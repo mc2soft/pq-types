@@ -67,19 +67,19 @@ var (
 )
 
 // Box2D type compatible with PostGIS Box2d type
-type Box2D struct {
+type PostGISBox2D struct {
 	Min, Max PostGISPoint
 }
 
 // Value implements database/sql/driver Valuer interface.
-func (b Box2D) Value() (driver.Value, error) {
+func (b PostGISBox2D) Value() (driver.Value, error) {
 	return []byte(fmt.Sprintf("BOX(%.7f %.7f,%.7f %.7f)", b.Min.Lon, b.Min.Lat, b.Max.Lon, b.Max.Lat)), nil
 }
 
 // Scan implements database/sql Scanner interface.
-func (b *Box2D) Scan(value interface{}) error {
+func (b *PostGISBox2D) Scan(value interface{}) error {
 	if value == nil {
-		*b = Box2D{}
+		*b = PostGISBox2D{}
 		return nil
 	}
 
@@ -101,8 +101,8 @@ func (b *Box2D) Scan(value interface{}) error {
 
 // check interfaces
 var (
-	_ driver.Valuer = Box2D{}
-	_ sql.Scanner   = &Box2D{}
+	_ driver.Valuer = PostGISBox2D{}
+	_ sql.Scanner   = &PostGISBox2D{}
 )
 
 // Polygon type compatible with PostGIS POLYGON type

@@ -4,7 +4,7 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-func (s *TypesSuite) TestPointScanValue(c *C) {
+func (s *TypesSuite) TestPostGISPointScanValue(c *C) {
 	var a PostGISPoint
 	b := []byte{
 		0x30, 0x31, 0x30, 0x31, 0x30, 0x30, 0x30, 0x30, 0x32, 0x30, 0x45, 0x36,
@@ -20,7 +20,7 @@ func (s *TypesSuite) TestPointScanValue(c *C) {
 	c.Check(v, DeepEquals, []byte(`SRID=4326;POINT(37.6088900 55.8219130)`))
 }
 
-func (s *TypesSuite) TestPoint(c *C) {
+func (s *TypesSuite) TestPostGISPoint(c *C) {
 	if s.skipPostGIS {
 		c.Skip("PostGIS not available")
 	}
@@ -44,25 +44,25 @@ func (s *TypesSuite) TestPoint(c *C) {
 	}
 }
 
-func (s *TypesSuite) TestBox2DScanValue(c *C) {
-	var a Box2D
+func (s *TypesSuite) TestPostGISBox2DScanValue(c *C) {
+	var a PostGISBox2D
 	b := []byte{
 		0x42, 0x4f, 0x58, 0x28, 0x30, 0x2e, 0x31, 0x32, 0x35, 0x20, 0x30, 0x2e,
 		0x32, 0x35, 0x2c, 0x30, 0x2e, 0x35, 0x20, 0x31, 0x29,
 	}
 	c.Check(a.Scan(b), IsNil)
-	c.Check(a, DeepEquals, Box2D{Min: PostGISPoint{Lon: 0.125, Lat: 0.25}, Max: PostGISPoint{Lon: 0.5, Lat: 1}})
+	c.Check(a, DeepEquals, PostGISBox2D{Min: PostGISPoint{Lon: 0.125, Lat: 0.25}, Max: PostGISPoint{Lon: 0.5, Lat: 1}})
 	v, err := a.Value()
 	c.Check(err, IsNil)
 	c.Check(v, DeepEquals, []byte(`BOX(0.1250000 0.2500000,0.5000000 1.0000000)`))
 }
 
-func (s *TypesSuite) TestBox2D(c *C) {
+func (s *TypesSuite) TestPostGISBox2D(c *C) {
 	if s.skipPostGIS {
 		c.Skip("PostGIS not available")
 	}
 
-	for _, b := range []Box2D{
+	for _, b := range []PostGISBox2D{
 		{Min: PostGISPoint{Lon: 0.125, Lat: 0.25}, Max: PostGISPoint{Lon: 0.5, Lat: 1}},
 		{Min: PostGISPoint{Lon: -0.125, Lat: -0.25}, Max: PostGISPoint{Lon: 0.5, Lat: 1}},
 		{Min: PostGISPoint{Lon: -0.55, Lat: -0.55}, Max: PostGISPoint{Lon: 0.5, Lat: 1}},
@@ -72,7 +72,7 @@ func (s *TypesSuite) TestBox2D(c *C) {
 		_, err := s.db.Exec("INSERT INTO pq_types (box) VALUES($1)", b)
 		c.Assert(err, IsNil)
 
-		var b1 Box2D
+		var b1 PostGISBox2D
 		err = s.db.QueryRow("SELECT box FROM pq_types").Scan(&b1)
 		c.Check(err, IsNil)
 
