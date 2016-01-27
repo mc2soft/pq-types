@@ -77,9 +77,9 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 		log.Print(version)
 
 		_, err = s.db.Exec(`ALTER TABLE pq_types
-			ADD COLUMN point geometry(POINT, 4326),
+			ADD COLUMN point geography(POINT, 4326),
 			ADD COLUMN box box2d,
-			ADD COLUMN polygon geometry(POLYGON, 4326)
+			ADD COLUMN polygon geography(POLYGON, 4326)
 		`)
 		c.Assert(err, IsNil)
 	} else {
