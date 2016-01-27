@@ -17,7 +17,7 @@ func (s *TypesSuite) TestPostGISPointScanValue(c *C) {
 	c.Check(a, DeepEquals, PostGISPoint{Lon: 37.6088900, Lat: 55.8219130})
 	v, err := a.Value()
 	c.Check(err, IsNil)
-	c.Check(v, DeepEquals, []byte(`SRID=4326;POINT(37.6088900 55.8219130)`))
+	c.Check(v, DeepEquals, []byte(`SRID=4326;POINT(37.60889000 55.82191300)`), Commentf("%s", v))
 }
 
 func (s *TypesSuite) TestPostGISPoint(c *C) {
@@ -54,7 +54,7 @@ func (s *TypesSuite) TestPostGISBox2DScanValue(c *C) {
 	c.Check(a, DeepEquals, PostGISBox2D{Min: PostGISPoint{Lon: 0.125, Lat: 0.25}, Max: PostGISPoint{Lon: 0.5, Lat: 1}})
 	v, err := a.Value()
 	c.Check(err, IsNil)
-	c.Check(v, DeepEquals, []byte(`BOX(0.1250000 0.2500000,0.5000000 1.0000000)`))
+	c.Check(v, DeepEquals, []byte(`BOX(0.12500000 0.25000000,0.50000000 1.00000000)`), Commentf("%s", v))
 }
 
 func (s *TypesSuite) TestPostGISBox2D(c *C) {
@@ -113,7 +113,7 @@ func (s *TypesSuite) TestPostGISPolygonScanValue(c *C) {
 	})
 	v, err := a.Value()
 	c.Check(err, IsNil)
-	c.Check(v, DeepEquals, []byte(`SRID=4326;POLYGON((0.1250000 0.2500000,0.1250000 1.0000000,0.5000000 1.0000000,0.5000000 0.2500000,0.1250000 0.2500000))`))
+	c.Check(v, DeepEquals, []byte(`SRID=4326;POLYGON((0.12500000 0.25000000,0.12500000 1.00000000,0.50000000 1.00000000,0.50000000 0.25000000,0.12500000 0.25000000))`), Commentf("%s", v))
 }
 
 func (s *TypesSuite) TestPostGISPolygon(c *C) {

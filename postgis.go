@@ -18,7 +18,7 @@ type PostGISPoint struct {
 // Value implements database/sql/driver Valuer interface.
 // It returns point as WKT with SRID 4326 (WGS 84).
 func (p PostGISPoint) Value() (driver.Value, error) {
-	return []byte(fmt.Sprintf("SRID=4326;POINT(%.7f %.7f)", p.Lon, p.Lat)), nil
+	return []byte(fmt.Sprintf("SRID=4326;POINT(%.8f %.8f)", p.Lon, p.Lat)), nil
 }
 
 type ewkbPoint struct {
@@ -74,7 +74,7 @@ type PostGISBox2D struct {
 // Value implements database/sql/driver Valuer interface.
 // It returns box as WKT.
 func (b PostGISBox2D) Value() (driver.Value, error) {
-	return []byte(fmt.Sprintf("BOX(%.7f %.7f,%.7f %.7f)", b.Min.Lon, b.Min.Lat, b.Max.Lon, b.Max.Lat)), nil
+	return []byte(fmt.Sprintf("BOX(%.8f %.8f,%.8f %.8f)", b.Min.Lon, b.Min.Lat, b.Max.Lon, b.Max.Lat)), nil
 }
 
 // Scan implements database/sql Scanner interface.
@@ -146,7 +146,7 @@ func (p *PostGISPolygon) Max() PostGISPoint {
 func (p PostGISPolygon) Value() (driver.Value, error) {
 	parts := make([]string, len(p.Points))
 	for i, pt := range p.Points {
-		parts[i] = fmt.Sprintf("%.7f %.7f", pt.Lon, pt.Lat)
+		parts[i] = fmt.Sprintf("%.8f %.8f", pt.Lon, pt.Lat)
 	}
 	return []byte(fmt.Sprintf("SRID=4326;POLYGON((%s))", strings.Join(parts, ","))), nil
 }
