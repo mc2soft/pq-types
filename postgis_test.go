@@ -80,8 +80,8 @@ func (s *TypesSuite) TestPostGISBox2D(c *C) {
 	}
 }
 
-func (s *TypesSuite) TestPolygonScanValue(c *C) {
-	var a Polygon
+func (s *TypesSuite) TestPostGISPolygonScanValue(c *C) {
+	var a PostGISPolygon
 	b := []byte{
 		0x30, 0x31, 0x30, 0x33, 0x30, 0x30, 0x30, 0x30, 0x32, 0x30, 0x45, 0x36,
 		0x31, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x30, 0x30, 0x30, 0x30,
@@ -102,7 +102,7 @@ func (s *TypesSuite) TestPolygonScanValue(c *C) {
 		0x33, 0x46,
 	}
 	c.Check(a.Scan(b), IsNil)
-	c.Check(a, DeepEquals, Polygon{
+	c.Check(a, DeepEquals, PostGISPolygon{
 		Points: []PostGISPoint{
 			{Lon: 0.125, Lat: 0.25},
 			{Lon: 0.125, Lat: 1},
@@ -116,12 +116,12 @@ func (s *TypesSuite) TestPolygonScanValue(c *C) {
 	c.Check(v, DeepEquals, []byte(`SRID=4326;POLYGON((0.1250000 0.2500000,0.1250000 1.0000000,0.5000000 1.0000000,0.5000000 0.2500000,0.1250000 0.2500000))`))
 }
 
-func (s *TypesSuite) TestPolygon(c *C) {
+func (s *TypesSuite) TestPostGISPolygon(c *C) {
 	if s.skipPostGIS {
 		c.Skip("PostGIS not available")
 	}
 
-	for _, p := range []Polygon{
+	for _, p := range []PostGISPolygon{
 		{
 			Points: []PostGISPoint{
 				{Lon: 0.125, Lat: 0.25},
@@ -141,7 +141,7 @@ func (s *TypesSuite) TestPolygon(c *C) {
 		_, err := s.db.Exec("INSERT INTO pq_types (polygon) VALUES($1)", p)
 		c.Assert(err, IsNil)
 
-		var p1 Polygon
+		var p1 PostGISPolygon
 		err = s.db.QueryRow("SELECT polygon FROM pq_types").Scan(&p1)
 		c.Check(err, IsNil)
 

@@ -66,7 +66,7 @@ var (
 	_ sql.Scanner   = &PostGISPoint{}
 )
 
-// Box2D type compatible with PostGIS Box2d type
+// PostGISBox2D is wrapper for PostGIS Box2D type.
 type PostGISBox2D struct {
 	Min, Max PostGISPoint
 }
@@ -106,19 +106,20 @@ var (
 )
 
 // Polygon type compatible with PostGIS POLYGON type
-type Polygon struct {
+// PostGISBox2D is wrapper for PostGIS Box2D type.
+type PostGISPolygon struct {
 	Points []PostGISPoint
 }
 
 // MakeEnvelope returns rectangular (min, max) polygon
-func MakeEnvelope(min, max PostGISPoint) Polygon {
-	return Polygon{
+func MakeEnvelope(min, max PostGISPoint) PostGISPolygon {
+	return PostGISPolygon{
 		Points: []PostGISPoint{min, {Lon: min.Lon, Lat: max.Lat}, max, {Lon: max.Lon, Lat: min.Lat}, min},
 	}
 }
 
 // Min returns min side of rectangular polygon
-func (p *Polygon) Min() PostGISPoint {
+func (p *PostGISPolygon) Min() PostGISPoint {
 	if len(p.Points) != 5 || p.Points[0] != p.Points[4] ||
 		p.Points[0].Lon != p.Points[1].Lon || p.Points[0].Lat != p.Points[3].Lat ||
 		p.Points[1].Lat != p.Points[2].Lat || p.Points[2].Lon != p.Points[3].Lon {
@@ -129,7 +130,7 @@ func (p *Polygon) Min() PostGISPoint {
 }
 
 // Max returns max side of rectangular polygon
-func (p *Polygon) Max() PostGISPoint {
+func (p *PostGISPolygon) Max() PostGISPoint {
 	if len(p.Points) != 5 || p.Points[0] != p.Points[4] ||
 		p.Points[0].Lon != p.Points[1].Lon || p.Points[0].Lat != p.Points[3].Lat ||
 		p.Points[1].Lat != p.Points[2].Lat || p.Points[2].Lon != p.Points[3].Lon {
@@ -140,7 +141,7 @@ func (p *Polygon) Max() PostGISPoint {
 }
 
 // Value implements database/sql/driver Valuer interface.
-func (p Polygon) Value() (driver.Value, error) {
+func (p PostGISPolygon) Value() (driver.Value, error) {
 	parts := make([]string, len(p.Points))
 	for i, pt := range p.Points {
 		parts[i] = fmt.Sprintf("%.7f %.7f", pt.Lon, pt.Lat)
@@ -157,9 +158,9 @@ type ewkbPolygon struct {
 }
 
 // Scan implements database/sql Scanner interface.
-func (p *Polygon) Scan(value interface{}) error {
+func (p *PostGISPolygon) Scan(value interface{}) error {
 	if value == nil {
-		*p = Polygon{}
+		*p = PostGISPolygon{}
 		return nil
 	}
 
@@ -197,6 +198,6 @@ func (p *Polygon) Scan(value interface{}) error {
 
 // check interfaces
 var (
-	_ driver.Valuer = Polygon{}
-	_ sql.Scanner   = &Polygon{}
+	_ driver.Valuer = PostGISPolygon{}
+	_ sql.Scanner   = &PostGISPolygon{}
 )
