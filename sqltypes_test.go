@@ -55,6 +55,7 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 	_, err = s.db.Exec(`CREATE TABLE pq_types(
 		stringarray varchar[],
 		int32_array int[],
+		int64_array bigint[],
 		jsontext_varchar varchar
 	)`)
 	c.Assert(err, IsNil)

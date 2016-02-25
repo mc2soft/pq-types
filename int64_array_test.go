@@ -21,26 +21,26 @@ func (s *TypesSuite) TestInt64Array(c *C) {
 	} {
 		s.SetUpTest(c)
 
-		_, err := s.db.Exec("INSERT INTO pq_types (int32_array) VALUES($1)", d.a)
+		_, err := s.db.Exec("INSERT INTO pq_types (int64_array) VALUES($1)", d.a)
 		c.Assert(err, IsNil)
 
 		b1 := []byte("42")
 		a1 := Int64Array{42}
-		err = s.db.QueryRow("SELECT int32_array, int32_array FROM pq_types").Scan(&b1, &a1)
+		err = s.db.QueryRow("SELECT int64_array, int64_array FROM pq_types").Scan(&b1, &a1)
 		c.Check(err, IsNil)
 		c.Check(b1, DeepEquals, d.b, Commentf("\nb1  = %#q\nd.b = %#q", b1, d.b))
 		c.Check(a1, DeepEquals, d.a)
 
 		// check db array length
 		var length sql.NullInt64
-		err = s.db.QueryRow("SELECT array_length(int32_array, 1) FROM pq_types").Scan(&length)
+		err = s.db.QueryRow("SELECT array_length(int64_array, 1) FROM pq_types").Scan(&length)
 		c.Check(err, IsNil)
 		c.Check(length.Valid, Equals, len(d.a) > 0)
 		c.Check(length.Int64, Equals, int64(len(d.a)))
 
 		// check db array elements
 		for i := 0; i < len(d.a); i++ {
-			q := fmt.Sprintf("SELECT int32_array[%d] FROM pq_types", i+1)
+			q := fmt.Sprintf("SELECT int64_array[%d] FROM pq_types", i+1)
 			var el sql.NullInt64
 			err = s.db.QueryRow(q).Scan(&el)
 			c.Check(err, IsNil)

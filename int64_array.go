@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// Int64Array is a slice of int32 values, compatible with PostgreSQL's int[] and intarray module.
+// Int64Array is a slice of int64 values, compatible with PostgreSQL's bigint[].
 type Int64Array []int64
 
 func (a Int64Array) Len() int           { return len(a) }
@@ -61,7 +61,7 @@ func (a *Int64Array) Scan(value interface{}) error {
 	return nil
 }
 
-// EqualWithoutOrder returns true if two int32 arrays are equal without order, false otherwise.
+// EqualWithoutOrder returns true if two int64 arrays are equal without order, false otherwise.
 // It may sort both arrays in-place to do so.
 func (a Int64Array) EqualWithoutOrder(b Int64Array) bool {
 	if len(a) != len(b) {
