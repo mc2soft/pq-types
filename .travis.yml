@@ -8,6 +8,7 @@ env:
   - PGVERSION=9.2
   - PGVERSION=9.3
   - PGVERSION=9.4
+  - PGVERSION=9.5
 
 go:
   - 1.5.3
