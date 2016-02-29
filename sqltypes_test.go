@@ -11,10 +11,40 @@ import (
 	. "gopkg.in/check.v1"
 )
 
+type Logger interface {
+	Logf(format string, args ...interface{})
+}
+
+type DB struct {
+	*sql.DB
+	l Logger
+}
+
+func (db *DB) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	if db.l != nil {
+		db.l.Logf("%s (args = %#v)", query, args)
+	}
+	return db.DB.Query(query, args...)
+}
+
+func (db *DB) QueryRow(query string, args ...interface{}) *sql.Row {
+	if db.l != nil {
+		db.l.Logf("%s (args = %#v)", query, args)
+	}
+	return db.DB.QueryRow(query, args...)
+}
+
+func (db *DB) Exec(query string, args ...interface{}) (sql.Result, error) {
+	if db.l != nil {
+		db.l.Logf("%s (args = %#v)", query, args)
+	}
+	return db.DB.Exec(query, args...)
+}
+
 func Test(t *testing.T) { TestingT(t) }
 
 type TypesSuite struct {
-	db          *sql.DB
+	db          *DB
 	skipJSON    bool
 	skipJSONB   bool
 	skipPostGIS bool
@@ -25,7 +55,10 @@ var _ = Suite(&TypesSuite{})
 func (s *TypesSuite) SetUpSuite(c *C) {
 	db, err := sql.Open("postgres", "dbname=pq_types sslmode=disable")
 	c.Assert(err, IsNil)
-	s.db = db
+	s.db = &DB{
+		DB: db,
+		l:  c,
+	}
 
 	// log full version
 	var version string
@@ -90,10 +123,12 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 }
 
 func (s *TypesSuite) SetUpTest(c *C) {
+	s.db.l = c
 	_, err := s.db.Exec("TRUNCATE TABLE pq_types")
 	c.Check(err, IsNil)
 }
 
 func (s *TypesSuite) TearDownSuite(c *C) {
+	s.db.l = c
 	s.db.Close()
 }
