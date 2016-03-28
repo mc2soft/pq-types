@@ -15,6 +15,9 @@ type JSONText []byte
 
 // MarshalJSON returns j as the JSON encoding of j.
 func (j JSONText) MarshalJSON() ([]byte, error) {
+	if j == nil {
+		return []byte(`null`), nil
+	}
 	return j, nil
 }
 

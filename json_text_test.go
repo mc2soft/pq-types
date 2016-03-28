@@ -1,6 +1,8 @@
 package pq_types
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -22,6 +24,16 @@ func (s *TypesSuite) TestJSONText(c *C) {
 		{JSONText(`[{"b": true, "n": 123}, {"s": "foo", "obj": {"f1": 456, "f2": false}}, [null]]`),
 			[]byte(`[{"b": true, "n": 123}, {"s": "foo", "obj": {"f1": 456, "f2": false}}, [null]]`)},
 	} {
+		b1, err := json.Marshal(d.j)
+		c.Check(err, IsNil)
+		b := bytes.Replace(d.b, []byte(` `), nil, -1)
+		if d.j == nil {
+			// special case
+			c.Check(b1, DeepEquals, []byte(`null`))
+		} else {
+			c.Check(b1, DeepEquals, b, Commentf("\nb1  = %#q\nb  = %#q", b1, b))
+		}
+
 		for _, col := range []string{"jsontext_varchar", "jsontext_json", "jsontext_jsonb"} {
 			if strings.HasSuffix(col, "json") && s.skipJSON {
 				continue
@@ -32,7 +44,7 @@ func (s *TypesSuite) TestJSONText(c *C) {
 
 			s.SetUpTest(c)
 
-			_, err := s.db.Exec(fmt.Sprintf("INSERT INTO pq_types (%s) VALUES($1)", col), d.j)
+			_, err = s.db.Exec(fmt.Sprintf("INSERT INTO pq_types (%s) VALUES($1)", col), d.j)
 			c.Assert(err, IsNil)
 
 			b1 := []byte(`{"foo": "bar"}`)
