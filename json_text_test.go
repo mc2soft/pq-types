@@ -1,6 +1,7 @@
 package pq_types
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -12,6 +13,7 @@ func (s *TypesSuite) TestJSONText(c *C) {
 		j JSONText
 		b []byte
 	}
+
 	for _, d := range []testData{
 		{JSONText(nil), []byte(nil)},
 		{JSONText(`null`), []byte(`null`)},
@@ -39,6 +41,24 @@ func (s *TypesSuite) TestJSONText(c *C) {
 			c.Check(err, IsNil)
 			c.Check(b1, DeepEquals, d.b, Commentf("\nb1  = %#q\nd.b = %#q", b1, d.b))
 			c.Check(j1, DeepEquals, d.j)
+		}
+	}
+
+	for _, j := range []JSONText{
+		JSONText{},
+	} {
+		for _, col := range []string{"jsontext_varchar", "jsontext_json", "jsontext_jsonb"} {
+			if strings.HasSuffix(col, "json") && s.skipJSON {
+				continue
+			}
+			if strings.HasSuffix(col, "jsonb") && s.skipJSONB {
+				continue
+			}
+
+			s.SetUpTest(c)
+
+			_, err := s.db.Exec(fmt.Sprintf("INSERT INTO pq_types (%s) VALUES($1)", col), j)
+			c.Check(err, DeepEquals, errors.New(`sql: converting Exec argument #0's type: unexpected end of JSON input`))
 		}
 	}
 }
