@@ -13,6 +13,11 @@ import (
 // and can be used to delay JSON decoding or precompute a JSON encoding.
 type JSONText []byte
 
+// String implements fmt.Stringer for better output and logging.
+func (j JSONText) String() string {
+	return string(j)
+}
+
 // MarshalJSON returns j as the JSON encoding of j.
 func (j JSONText) MarshalJSON() ([]byte, error) {
 	if j == nil {
@@ -70,4 +75,6 @@ var (
 	_ json.Unmarshaler = &JSONText{}
 	_ driver.Valuer    = JSONText{}
 	_ sql.Scanner      = &JSONText{}
+	_ fmt.Stringer     = JSONText{}
+	_ fmt.Stringer     = &JSONText{}
 )
