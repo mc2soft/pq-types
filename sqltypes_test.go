@@ -86,7 +86,7 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 
 	s.db.Exec("DROP TABLE IF EXISTS pq_types")
 	_, err = s.db.Exec(`CREATE TABLE pq_types(
-		stringarray varchar[],
+		string_array varchar[],
 		int32_array int[],
 		int64_array bigint[],
 		jsontext_varchar varchar
