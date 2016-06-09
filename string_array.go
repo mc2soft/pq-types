@@ -50,7 +50,12 @@ func (a *StringArray) Scan(value interface{}) error {
 		return fmt.Errorf("StringArray.Scan: unexpected data %q", v)
 	}
 
+	// reuse underlying array if present
+	if *a == nil {
+		*a = make(StringArray, 0)
+	}
 	*a = (*a)[:0]
+
 	if len(v) == 2 { // '{}'
 		return nil
 	}

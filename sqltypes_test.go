@@ -132,3 +132,30 @@ func (s *TypesSuite) TearDownSuite(c *C) {
 	s.db.l = c
 	s.db.Close()
 }
+
+func (s *TypesSuite) TestEmpty(c *C) {
+	type record struct {
+		i32a Int32Array
+		i64a Int64Array
+		sa   StringArray
+	}
+
+	for _, r := range []record{
+		{},
+		{i32a: Int32Array{}, i64a: Int64Array{}, sa: StringArray{}},
+	} {
+		s.SetUpTest(c)
+
+		_, err := s.db.Exec(
+			"INSERT INTO pq_types (int32_array, int64_array, string_array) VALUES($1, $2, $3)",
+			r.i32a, r.i64a, r.sa,
+		)
+		c.Assert(err, IsNil)
+
+		var r1 record
+		row := s.db.QueryRow("SELECT int32_array, int64_array, string_array FROM pq_types")
+		err = row.Scan(&r1.i32a, &r1.i64a, &r1.sa)
+		c.Check(err, IsNil)
+		c.Check(r1, DeepEquals, r)
+	}
+}

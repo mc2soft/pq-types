@@ -46,7 +46,13 @@ func (a *Int32Array) Scan(value interface{}) error {
 	}
 
 	p := strings.Split(string(v[1:len(v)-1]), ",")
-	res := make(Int32Array, 0, len(p))
+
+	// reuse underlying array if present
+	if *a == nil {
+		*a = make(Int32Array, 0, len(p))
+	}
+	*a = (*a)[:0]
+
 	for _, s := range p {
 		if s == "" {
 			continue
@@ -55,9 +61,9 @@ func (a *Int32Array) Scan(value interface{}) error {
 		if err != nil {
 			return err
 		}
-		res = append(res, int32(i))
+		*a = append(*a, int32(i))
 	}
-	*a = res
+
 	return nil
 }
 
