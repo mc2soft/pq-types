@@ -16,7 +16,7 @@ type TimeBound struct {
 	Time      *time.Time
 }
 
-// TSRange is a wrapper for postresql tsrange type
+// TSRange is a wrapper for postresql tsrange type.
 type TSRange struct {
 	LowerBound TimeBound
 	UpperBound TimeBound
@@ -26,7 +26,7 @@ const (
 	timeFormat = "2006-01-02 15:04:05"
 )
 
-// Value implements database/sql/driver Valuer interface
+// Value implements database/sql/driver Valuer interface.
 func (t TSRange) Value() (driver.Value, error) {
 	res := []byte{}
 	if t.LowerBound.Inclusive {
@@ -51,7 +51,7 @@ func (t TSRange) Value() (driver.Value, error) {
 	return res, nil
 }
 
-// Scan implements database/sql Scanner interface
+// Scan implements database/sql Scanner interface.
 func (t *TSRange) Scan(value interface{}) error {
 	v, ok := value.([]byte)
 	if !ok {
