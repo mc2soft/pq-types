@@ -38,7 +38,7 @@ func (p *PostGISPoint) Scan(value interface{}) error {
 
 	v, ok := value.([]byte)
 	if !ok {
-		return fmt.Errorf("pq_types: expected []byte, got %T (%v)", value, value)
+		return fmt.Errorf("PostGISPoint.Scan: expected []byte, got %T (%v)", value, value)
 	}
 
 	ewkb := make([]byte, hex.DecodedLen(len(v)))
@@ -54,7 +54,7 @@ func (p *PostGISPoint) Scan(value interface{}) error {
 	}
 
 	if ewkbP.ByteOrder != 1 || ewkbP.WkbType != 0x20000001 || ewkbP.SRID != 4326 {
-		return fmt.Errorf("pq_types: unexpected ewkb %#v", ewkbP)
+		return fmt.Errorf("PostGISPoint.Scan: unexpected ewkb %#v", ewkbP)
 	}
 	*p = ewkbP.Point
 	return nil
@@ -87,7 +87,7 @@ func (b *PostGISBox2D) Scan(value interface{}) error {
 
 	v, ok := value.([]byte)
 	if !ok {
-		return fmt.Errorf("pq_types: expected []byte, got %T (%v)", value, value)
+		return fmt.Errorf("PostGISBox2D.Scan: expected []byte, got %T (%v)", value, value)
 	}
 
 	n, err := fmt.Sscanf(string(v), "BOX(%f %f,%f %f)", &b.Min.Lon, &b.Min.Lat, &b.Max.Lon, &b.Max.Lat)
@@ -95,7 +95,7 @@ func (b *PostGISBox2D) Scan(value interface{}) error {
 		return err
 	}
 	if n != 4 {
-		return fmt.Errorf("not enough params in the string: %v, %v != 4", v, n)
+		return fmt.Errorf("PostGISBox2D.Scan: not enough params in the string: %v, %v != 4", v, n)
 	}
 
 	return nil
@@ -169,7 +169,7 @@ func (p *PostGISPolygon) Scan(value interface{}) error {
 
 	v, ok := value.([]byte)
 	if !ok {
-		return fmt.Errorf("pq_types: expected []byte, got %T (%v)", value, value)
+		return fmt.Errorf("PostGISPolygon.Scan: expected []byte, got %T (%v)", value, value)
 	}
 
 	ewkb := make([]byte, hex.DecodedLen(len(v)))
@@ -187,7 +187,7 @@ func (p *PostGISPolygon) Scan(value interface{}) error {
 	}
 
 	if ewkbP.ByteOrder != 1 || ewkbP.WkbType != 0x20000003 || ewkbP.SRID != 4326 || ewkbP.Rings != 1 {
-		return fmt.Errorf("pq_types: unexpected ewkb %#v", ewkbP)
+		return fmt.Errorf("PostGISPolygon.Scan: unexpected ewkb %#v", ewkbP)
 	}
 	p.Points = make([]PostGISPoint, ewkbP.Count)
 
