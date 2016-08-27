@@ -8,6 +8,9 @@ import (
 )
 
 func (s *TypesSuite) TestTSRange(c *C) {
+	if s.skipTSRange {
+		c.Skip("TSRange not available")
+	}
 	type testData struct {
 		ts TSRange
 		s  string

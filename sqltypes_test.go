@@ -79,6 +79,8 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 	if minor <= 1 {
 		log.Print("json not available")
 		s.skipJSON = true
+		log.Print("tsrange not available")
+		s.skipTSRange = true
 	}
 	if minor <= 3 {
 		log.Print("jsonb not available")
