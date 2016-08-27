@@ -8,11 +8,15 @@ import (
 	"time"
 )
 
+// TimeBound represents Upper and Lower bound for TSRange.
+// Time may be nil, so this will be infinity.
+// If Time is nil and bound is Inclusive, it will be converted to exclusive by postgresql.
 type TimeBound struct {
 	Inclusive bool
 	Time      *time.Time
 }
 
+// TSRange is a wrapper for postresql tsrange type
 type TSRange struct {
 	LowerBound TimeBound
 	UpperBound TimeBound
@@ -22,6 +26,7 @@ const (
 	timeFormat = "2006-01-02 15:04:05"
 )
 
+// Value implements database/sql/driver Valuer interface
 func (t TSRange) Value() (driver.Value, error) {
 	res := []byte{}
 	if t.LowerBound.Inclusive {
@@ -46,6 +51,7 @@ func (t TSRange) Value() (driver.Value, error) {
 	return res, nil
 }
 
+// Scan implements database/sql Scanner interface
 func (t *TSRange) Scan(value interface{}) error {
 	v, ok := value.([]byte)
 	if !ok {
