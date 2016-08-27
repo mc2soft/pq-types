@@ -60,12 +60,17 @@ func (j *JSONText) Scan(value interface{}) error {
 		return nil
 	}
 
-	v, ok := value.([]byte)
-	if !ok {
-		return fmt.Errorf("pq_types: expected []byte, got %T (%q)", value, value)
+	var b []byte
+	switch v := value.(type) {
+	case []byte:
+		b = v
+	case string:
+		b = []byte(v)
+	default:
+		return fmt.Errorf("JSONText.Scan: expected []byte or string, got %T (%q)", value, value)
 	}
 
-	*j = JSONText(append((*j)[0:0], v...))
+	*j = JSONText(append((*j)[0:0], b...))
 	return nil
 }
 

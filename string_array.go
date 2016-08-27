@@ -41,13 +41,18 @@ func (a *StringArray) Scan(value interface{}) error {
 		return nil
 	}
 
-	v, ok := value.([]byte)
-	if !ok {
-		return fmt.Errorf("StringArray.Scan: expected []byte, got %T (%q)", value, value)
+	var b []byte
+	switch v := value.(type) {
+	case []byte:
+		b = v
+	case string:
+		b = []byte(v)
+	default:
+		return fmt.Errorf("StringArray.Scan: expected []byte or string, got %T (%q)", value, value)
 	}
 
-	if len(v) < 2 || v[0] != '{' || v[len(v)-1] != '}' {
-		return fmt.Errorf("StringArray.Scan: unexpected data %q", v)
+	if len(b) < 2 || b[0] != '{' || b[len(b)-1] != '}' {
+		return fmt.Errorf("StringArray.Scan: unexpected data %q", b)
 	}
 
 	// reuse underlying array if present
@@ -56,11 +61,11 @@ func (a *StringArray) Scan(value interface{}) error {
 	}
 	*a = (*a)[:0]
 
-	if len(v) == 2 { // '{}'
+	if len(b) == 2 { // '{}'
 		return nil
 	}
 
-	reader := bytes.NewReader(v[1 : len(v)-1]) // skip '{' and '}'
+	reader := bytes.NewReader(b[1 : len(b)-1]) // skip '{' and '}'
 
 	// helper function to read next rune and check if it valid
 	readRune := func() (rune, error) {

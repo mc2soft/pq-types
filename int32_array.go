@@ -36,16 +36,21 @@ func (a *Int32Array) Scan(value interface{}) error {
 		return nil
 	}
 
-	v, ok := value.([]byte)
-	if !ok {
-		return fmt.Errorf("Int32Array.Scan: expected []byte, got %T (%q)", value, value)
+	var b []byte
+	switch v := value.(type) {
+	case []byte:
+		b = v
+	case string:
+		b = []byte(v)
+	default:
+		return fmt.Errorf("Int32Array.Scan: expected []byte or string, got %T (%q)", value, value)
 	}
 
-	if len(v) < 2 || v[0] != '{' || v[len(v)-1] != '}' {
-		return fmt.Errorf("Int32Array.Scan: unexpected data %q", v)
+	if len(b) < 2 || b[0] != '{' || b[len(b)-1] != '}' {
+		return fmt.Errorf("Int32Array.Scan: unexpected data %q", b)
 	}
 
-	p := strings.Split(string(v[1:len(v)-1]), ",")
+	p := strings.Split(string(b[1:len(b)-1]), ",")
 
 	// reuse underlying array if present
 	if *a == nil {
