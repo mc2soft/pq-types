@@ -48,6 +48,7 @@ type TypesSuite struct {
 	skipJSON    bool
 	skipJSONB   bool
 	skipPostGIS bool
+	skipTSRange bool
 }
 
 var _ = Suite(&TypesSuite{})
@@ -100,6 +101,11 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 
 	if !s.skipJSONB {
 		_, err = s.db.Exec(`ALTER TABLE pq_types ADD COLUMN jsontext_jsonb jsonb`)
+		c.Assert(err, IsNil)
+	}
+
+	if !s.skipTSRange {
+		_, err = s.db.Exec(`ALTER TABLE pq_types ADD COLUMN tsrange tsrange`)
 		c.Assert(err, IsNil)
 	}
 
