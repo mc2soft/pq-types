@@ -64,7 +64,11 @@ func (a *Int32Array) Scan(value interface{}) error {
 		}
 		i, err := strconv.Atoi(s)
 		if err != nil {
-			return err
+			if s == "NULL" {
+				i = 0
+			} else {
+				return err
+			}
 		}
 		*a = append(*a, int32(i))
 	}
