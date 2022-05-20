@@ -89,7 +89,11 @@ func (s *TypesSuite) SetUpSuite(c *C) {
 		string_array varchar[],
 		int32_array int[],
 		int64_array bigint[],
-		jsontext_varchar varchar
+		jsontext_varchar varchar,
+		null_str varchar,
+		null_int32 int4,
+		null_int64 int8,
+		null_timestamp timestamptz
 	)`)
 	c.Assert(err, IsNil)
 
